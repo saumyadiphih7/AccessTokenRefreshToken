@@ -7,19 +7,33 @@ const productAdd = asyncHandler(async (req, res) => {
     res.status(403);
     throw new Error("Not authorized as admin.Cannot add product");
   }
-  const { title,price} = req.body;
+  const { title, price } = req.body;
+  
+  
 
   if (!title || !price) {
     res.status(400);
     throw new Error("Please add all fields");
   }
 
+  const files = req.files;
+   if (!files|| files.length === 0) {
+     res.status(400);
+     throw new Error("Please add at least one image");
+  }
+  
+   const imagePaths = files.map((file) => file.path);
+
   const product = await Product.create({
     title,
     price,
+    image: imagePaths,
   });
 
-  res.status(201).json(product);
+  res.status(201).json({
+    "message": "Product created",
+     product
+  });
 });
 
 const productGet = asyncHandler(async (req, res) => {
